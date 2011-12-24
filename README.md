@@ -9,6 +9,13 @@ How it Works
 
 A template filter is created which renders inline markup to include content.
 
+
+Requirements
+------------
+
+* [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup/) is required for parsing markup.
+
+
 Setup
 -----
 
