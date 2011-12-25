@@ -31,7 +31,7 @@ To include a photo in a blog post body, you might put the following into the bod
 
 To render this in a template, you would use the template filter.
 
-    {% load inlines %}
+    {% load inlines_tags %}
     {{ post.body|render_inlines }}
 
 This would insert the `media.photo` object with an ID of `1` into the post body.
