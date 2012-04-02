@@ -25,7 +25,6 @@ def inlines(value, return_list=False):
 
     # Replace inline markup in the value with rendered inline templates.
     else:
-        body = str(content)
         for inline in content.findAll('inline'):
             rendered_inline = render_inline(inline)
             if rendered_inline:
@@ -33,8 +32,8 @@ def inlines(value, return_list=False):
                                                    rendered_inline['context'])
             else:
                 inline_template = ''
-            body = body.replace(str(inline), inline_template)
-        return mark_safe(unicode(body))
+            value = value.replace(str(inline), inline_template)
+        return mark_safe(unicode(value))
 
 
 def render_inline(inline):
