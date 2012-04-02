@@ -16,19 +16,25 @@ def inlines(value, return_list=False):
     content = BeautifulStoneSoup(value, selfClosingTags=['inline','img','br','input','meta','link','hr'])
     inline_list = []
 
+    # Return a list of inline objects found in the value.
     if return_list:
         for inline in content.findAll('inline'):
             rendered_inline = render_inline(inline)
             inline_list.append(rendered_inline['context'])
         return inline_list
+
+    # Replace inline markup in the value with rendered inline templates.
     else:
+        body = str(content)
         for inline in content.findAll('inline'):
             rendered_inline = render_inline(inline)
             if rendered_inline:
-                inline.replaceWith(render_to_string(rendered_inline['template'], rendered_inline['context']))
+                inline_template = render_to_string(rendered_inline['template'],
+                                                   rendered_inline['context'])
             else:
-                inline.replaceWith('')
-        return mark_safe(unicode(content))
+                inline_template = ''
+            body = body.replace(str(inline), inline_template)
+        return mark_safe(unicode(body))
 
 
 def render_inline(inline):
