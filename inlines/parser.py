@@ -14,10 +14,10 @@ def inlines(value, return_list=False):
         from beautifulsoup import BeautifulStoneSoup
 
     content = BeautifulStoneSoup(value, selfClosingTags=['inline','img','br','input','meta','link','hr'])
-    inline_list = []
 
     # Return a list of inline objects found in the value.
     if return_list:
+        inline_list = []
         for inline in content.findAll('inline'):
             rendered_inline = render_inline(inline)
             inline_list.append(rendered_inline['context'])
@@ -40,7 +40,6 @@ def render_inline(inline):
     """
     Replace inline markup with template markup that matches the
     appropriate app and model.
-
     """
 
     # Look for inline type, 'app.model'
@@ -62,27 +61,29 @@ def render_inline(inline):
         else:
             return ''
 
-    # Check for an inline class attribute
-    try:
-        inline_class = smart_unicode(inline['class'])
-    except:
-        inline_class = ''
+    # Create the context with all the attributes in the inline markup.
+    context = {k:v for k,v in inline.attrs}
 
+    # If multiple IDs were specified, build a list of all requested objects
+    # and add them to the context.
     try:
         try:
             id_list = [int(i) for i in inline['ids'].split(',')]
             obj_list = model.objects.in_bulk(id_list)
             obj_list = list(obj_list[int(i)] for i in id_list)
-            context = { 'object_list': obj_list, 'class': inline_class }
+            context['object_list'] = obj_list
         except ValueError:
             if settings.DEBUG:
                 raise ValueError, "The <inline> ids attribute is missing or invalid."
             else:
                 return ''
+
+    # If only one ID was specified, retrieve the requested object and add it
+    # to the context.
     except KeyError:
         try:
             obj = model.objects.get(pk=inline['id'])
-            context = { 'content_type':"%s.%s" % (app_label, model_name), 'object': obj, 'class': inline_class, 'settings': settings }
+            context['object'] = obj
         except model.DoesNotExist:
             if settings.DEBUG:
                 raise model.DoesNotExist, "%s with pk of '%s' does not exist" % (model_name, inline['id'])
@@ -94,7 +95,8 @@ def render_inline(inline):
             else:
                 return ''
 
+    # Set the name of the template that should be used to render the inline.
     template = ["inlines/%s_%s.html" % (app_label, model_name), "inlines/default.html"]
-    rendered_inline = {'template':template, 'context':context}
 
-    return rendered_inline
+    # Return the template name and the context.
+    return {'template': template, 'context': context}
