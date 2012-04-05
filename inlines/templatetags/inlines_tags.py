@@ -43,6 +43,7 @@ def render_inlines(value):
     """
     return inlines(value)
 
+
 @register.filter
 def extract_inlines(value):
     return inlines(value, True)
@@ -56,6 +57,7 @@ class InlineTypes(template.Node):
         types = InlineType.objects.all()
         context[self.var_name] = types
         return ''
+
 
 @register.tag(name='get_inline_types')
 def do_get_inline_types(parser, token):
@@ -73,9 +75,11 @@ def do_get_inline_types(parser, token):
     try:
         tag_name, arg = token.contents.split(None, 1)
     except ValueError:
-        raise template.TemplateSyntaxError, "%s tag requires arguments" % token.contents.split()[0]
+        raise template.TemplateSyntaxError("%s tag requires arguments"
+                                           % token.contents.split()[0])
     m = re.search(r'as (\w+)', arg)
     if not m:
-        raise template.TemplateSyntaxError, "%s tag had invalid arguments" % tag_name
+        raise template.TemplateSyntaxError("%s tag had invalid arguments"
+                                           % tag_name)
     var_name = m.groups()[0]
     return InlineTypes(var_name)

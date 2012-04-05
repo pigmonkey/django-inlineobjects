@@ -13,7 +13,9 @@ def inlines(value, return_list=False):
     except ImportError:
         from beautifulsoup import BeautifulStoneSoup
 
-    content = BeautifulStoneSoup(value, selfClosingTags=['inline','img','br','input','meta','link','hr'])
+    content = BeautifulStoneSoup(value, selfClosingTags=['inline', 'img', 'br',
+                                                         'input', 'meta',
+                                                         'link', 'hr'])
 
     # Return a list of inline objects found in the value.
     if return_list:
@@ -47,22 +49,24 @@ def render_inline(inline):
         app_label, model_name = inline['type'].split('.')
     except:
         if settings.DEBUG:
-            raise TemplateSyntaxError, "Couldn't find the attribute 'type' in the <inline> tag."
+            raise TemplateSyntaxError("Couldn't find the attribute 'type' in "
+                                       "the <inline> tag.")
         else:
             return ''
 
     # Look for content type
     try:
-        content_type = ContentType.objects.get(app_label=app_label, model=model_name)
+        content_type = ContentType.objects.get(app_label=app_label,
+                                               model=model_name)
         model = content_type.model_class()
     except ContentType.DoesNotExist:
         if settings.DEBUG:
-            raise TemplateSyntaxError, "Inline ContentType not found."
+            raise TemplateSyntaxError("Inline ContentType not found.")
         else:
             return ''
 
     # Create the context with all the attributes in the inline markup.
-    context = {k:v for k,v in inline.attrs}
+    context = {k: v for k, v in inline.attrs}
 
     # If multiple IDs were specified, build a list of all requested objects
     # and add them to the context.
@@ -74,7 +78,8 @@ def render_inline(inline):
             context['object_list'] = obj_list
         except ValueError:
             if settings.DEBUG:
-                raise ValueError, "The <inline> ids attribute is missing or invalid."
+                raise ValueError("The <inline> ids attribute is missing or "
+                                 "invalid.")
             else:
                 return ''
 
@@ -86,17 +91,20 @@ def render_inline(inline):
             context['object'] = obj
         except model.DoesNotExist:
             if settings.DEBUG:
-                raise model.DoesNotExist, "%s with pk of '%s' does not exist" % (model_name, inline['id'])
+                raise model.DoesNotExist("%s with pk of '%s' does not exist"
+                                         % (model_name, inline['id']))
             else:
                 return ''
         except:
             if settings.DEBUG:
-                raise TemplateSyntaxError, "The <inline> id attribute is missing or invalid."
+                raise TemplateSyntaxError("The <inline> id attribute is "
+                                          "missing or invalid.")
             else:
                 return ''
 
     # Set the name of the template that should be used to render the inline.
-    template = ["inlines/%s_%s.html" % (app_label, model_name), "inlines/default.html"]
+    template = ["inlines/%s_%s.html" % (app_label, model_name),
+                "inlines/default.html"]
 
     # Return the template name and the context.
     return {'template': template, 'context': context}
