@@ -17,7 +17,7 @@
 
         content += '<strong>Object:</strong> '
         content += '<input type="text" class="vIntegerField" id="id_inline" size="10" /> '
-        content += '<a id="lookup_id_inline" href="#" class="related-lookup" onclick="if(document.getElementById(\'id_inline_content_type\').value != \'----------\') { return showRelatedObjectLookupPopup(this); }" style="margin-right:20px;"><img src="{% admin_media_prefix %}img/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a> '
+        content += '<a id="lookup_id_inline" href="#" class="related-lookup" onclick="if(document.getElementById(\'id_inline_content_type\').value != \'----------\') { return showRelatedObjectLookupPopup(this); }" style="margin-right:20px;"><img src="{{ STATIC_URL }}admin/img/selector-search.gif" width="16" height="16" alt="Lookup" /></a> '
 
         content += '<strong>Size:</strong> '
         content += '<select id="id_inline_size" style="margin-right:20px;">'
