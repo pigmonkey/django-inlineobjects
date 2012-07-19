@@ -1,7 +1,7 @@
-django-inlines
+django-inlineobjects
 ============
 
-A reusable [Django](http://www.djangoproject.com/) application used to insert content objects into other pieces of content. This application was originally created by [Nathan Borror](http://nathanborror.com/) for [django-basic-apps](https://github.com/nathanborror/django-basic-apps), his collection of simple prebuilt Django applications.
+A reusable [Django](http://www.djangoproject.com/) application used to insert objects into other objects. This application was originally created by [Nathan Borror](http://nathanborror.com/) for [django-basic-apps](https://github.com/nathanborror/django-basic-apps), his collection of simple prebuilt Django applications.
 
 
 How it Works
