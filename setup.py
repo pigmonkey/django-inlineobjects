@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name = 'django-inlineobjectss',
+    name = 'django-inlineobjects',
     packages = find_packages(),
     version = '1.0',
     description = 'A reusable Django application used to insert content objects into other pieces of content.',
