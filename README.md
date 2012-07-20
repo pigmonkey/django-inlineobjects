@@ -1,5 +1,5 @@
 django-inlineobjects
-============
+====================
 
 A reusable [Django](http://www.djangoproject.com/) application used to insert objects into other objects. This application was originally created by [Nathan Borror](http://nathanborror.com/) for [django-basic-apps](https://github.com/nathanborror/django-basic-apps), his collection of simple prebuilt Django applications.
 
@@ -14,6 +14,18 @@ Requirements
 ------------
 
 * [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup/) is required for parsing markup.
+
+
+Installation
+------------
+
+django-inlineobjects is available on PyPI and can be installed with PIP.
+
+    pip install django-inlineobjects
+
+Alternatively, you may download the source and install it.
+
+    python setup.py install
 
 
 Setup
