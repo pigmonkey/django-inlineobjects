@@ -89,6 +89,7 @@ def render_inline(inline):
         try:
             obj = model.objects.get(pk=inline['id'])
             context['object'] = obj
+            context['settings'] = settings
         except model.DoesNotExist:
             if settings.DEBUG:
                 raise model.DoesNotExist("%s with pk of '%s' does not exist"
