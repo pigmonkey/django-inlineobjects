@@ -1,4 +1,4 @@
-{% load adminmedia inlines_tags %}
+{% load inlines_tags %}
 <script type="text/javascript">
     function InlineInit() {
         var textarea = document.getElementById('id_{{ field }}');
