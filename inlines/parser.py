@@ -13,8 +13,9 @@ from inlines import settings
 
 class InlineRenderer(object):
 
-    def __init__(self, inline):
+    def __init__(self, inline, reset_cache=False):
         self.inline = inline
+        self.reset_cache = reset_cache
         if not isinstance(self.inline, Tag):
             raise ValueError('Inline must be bs4.element.Tag')
         self.get_app_model()
@@ -99,8 +100,9 @@ class InlineRenderer(object):
         return obj
 
     def render(self):
+        rendered_template = None
         # Attempt to get the rendered template from the cache.
-        if settings.INLINES_CACHE_TIMEOUT:
+        if not self.reset_cache and settings.INLINES_CACHE_TIMEOUT > 0:
             rendered_template = cache.get(self.cache_key)
         # If that failed, get the objects and render the template normally.
         if not rendered_template:
@@ -111,7 +113,7 @@ class InlineRenderer(object):
                 self.lookup_object()
             rendered_template = self.render_template()
             # Store the rendered template in the cache.
-            if settings.INLINES_CACHE_TIMEOUT:
+            if settings.INLINES_CACHE_TIMEOUT > 0:
                 cache.set(
                     self.cache_key,
                     rendered_template,
@@ -122,8 +124,9 @@ class InlineRenderer(object):
 
 class ContentParser(object):
 
-    def __init__(self, content):
+    def __init__(self, content, reset_cache=False):
         self.content = content
+        self.reset_cache = reset_cache
         self.soup = BeautifulSoup(self.content, 'html.parser')
         self.soup_string = str(self.soup)
         self.find_inlines()
@@ -135,7 +138,7 @@ class ContentParser(object):
     def render(self):
         for inline in self.inlines:
             try:
-                rendered_inline = InlineRenderer(inline).render()
+                rendered_inline = InlineRenderer(inline, self.reset_cache).render()
             except Exception as e:
                 if settings.INLINES_DEBUG:
                     raise TemplateSyntaxError('Failed to render inline: %s' % e.message)
