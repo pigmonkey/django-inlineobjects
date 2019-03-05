@@ -1,5 +1,5 @@
 from django import template
-from inlines.parser import inlines
+from inlines.parser import ContentParser
 from inlines.models import InlineType
 import re
 
@@ -41,12 +41,7 @@ def render_inlines(value):
     It would be wise to anticipate both object_list and object unless
     you know for sure one or the other will only be present.
     """
-    return inlines(value)
-
-
-@register.filter
-def extract_inlines(value):
-    return inlines(value, True)
+    return ContentParser(value).render()
 
 
 class InlineTypes(template.Node):

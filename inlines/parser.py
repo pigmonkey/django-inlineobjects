@@ -120,16 +120,26 @@ class InlineRenderer(object):
         return rendered_template
 
 
-def inlines(value):
-    content = BeautifulSoup(value, 'html.parser')
-    content_string = str(content)
-    for inline in content.findAll('inline'):
-        try:
-            rendered_inline = InlineRenderer(inline).render()
-        except Exception as e:
-            if settings.INLINES_DEBUG:
-                raise TemplateSyntaxError('Failed to render inline: %s' % e.message)
-            else:
-                rendered_inline = ''
-        content_string = content_string.replace(str(inline), rendered_inline)
-    return mark_safe(content_string)
+class ContentParser(object):
+
+    def __init__(self, content):
+        self.content = content
+        self.soup = BeautifulSoup(self.content, 'html.parser')
+        self.soup_string = str(self.soup)
+        self.find_inlines()
+
+    def find_inlines(self):
+        self.inlines = self.soup.find_all('inline')
+        return self.inlines
+
+    def render(self):
+        for inline in self.inlines:
+            try:
+                rendered_inline = InlineRenderer(inline).render()
+            except Exception as e:
+                if settings.INLINES_DEBUG:
+                    raise TemplateSyntaxError('Failed to render inline: %s' % e.message)
+                else:
+                    rendered_inline = ''
+            self.soup_string = self.soup_string.replace(str(inline), rendered_inline)
+        return mark_safe(self.soup_string)
