@@ -98,8 +98,11 @@ def render_inline(inline):
                 return ''
 
     # Set the name of the template that should be used to render the inline.
-    template = ["inlines/%s_%s.html" % (app_label, model_name),
-                "inlines/default.html"]
+    template = [
+        "%s/inlines/%s.html" % (app_label, model_name),
+        "inlines/%s_%s.html" % (app_label, model_name),
+        "inlines/default.html",
+    ]
 
     # Return the template name and the context.
     return {'template': template, 'context': context}
