@@ -5,6 +5,7 @@ from django.apps import apps
 from django.core.cache import cache
 from django.db.models import Case, When
 from django.template import TemplateSyntaxError
+from django.template.defaultfilters import slugify
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from inlines import settings
@@ -44,10 +45,12 @@ class InlineRenderer(object):
         return self.lookup_value
 
     def build_cache_key(self):
-        self.cache_key = 'inlines-%s-%s:%s' % (
-            self.inline['type'],
-            self.lookup_key,
-            self.lookup_value,
+        self.cache_key = slugify(
+            'inlines-%s-%s:%s' % (
+                self.inline['type'],
+                self.lookup_key,
+                self.lookup_value,
+            )
         )
         return self.cache_key
 
