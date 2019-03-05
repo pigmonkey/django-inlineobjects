@@ -6,30 +6,20 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 
-def inlines(value, return_list=False):
+def inlines(value):
     content = BeautifulSoup(value, 'html.parser')
-    # Return a list of inline objects found in the value.
-    if return_list:
-        inline_list = []
-        for inline in content.findAll('inline'):
-            rendered_inline = render_inline(inline)
-            inline_list.append(rendered_inline['context'])
-        return inline_list
-
-    # Replace inline markup in the value with rendered inline templates.
-    else:
-        content_string = str(content)
-        for inline in content.findAll('inline'):
-            rendered_inline = render_inline(inline)
-            if rendered_inline:
-                inline_template = render_to_string(
-                    rendered_inline['template'],
-                    rendered_inline['context'],
-                )
-            else:
-                inline_template = ''
-            content_string = content_string.replace(str(inline), inline_template)
-        return mark_safe(content_string)
+    content_string = str(content)
+    for inline in content.findAll('inline'):
+        rendered_inline = render_inline(inline)
+        if rendered_inline:
+            inline_template = render_to_string(
+                rendered_inline['template'],
+                rendered_inline['context'],
+            )
+        else:
+            inline_template = ''
+        content_string = content_string.replace(str(inline), inline_template)
+    return mark_safe(content_string)
 
 
 def render_inline(inline):
