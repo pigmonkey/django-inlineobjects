@@ -32,6 +32,17 @@ def render_inline(inline):
         else:
             return ''
 
+    # Find the first specified lookup key.
+    supported_keys = ['id']
+    lookup_key = next((x for x in supported_keys if x in inline.attrs), None)
+    if not lookup_key:
+        if settings.DEBUG:
+            raise TemplateSyntaxError(
+                "Couldn't find any supported lookup key in the <inline> tag."
+            )
+        else:
+            return ''
+
     # Look for content type
     try:
         content_type = ContentType.objects.get(
@@ -48,46 +59,43 @@ def render_inline(inline):
     # Create the context with all the attributes in the inline markup.
     context = dict((attr[0], attr[1]) for attr in inline.attrs)
 
-    # If multiple IDs were specified, build a list of all requested objects and
-    # add them to the context.
-    try:
-        try:
-            id_list = [int(i) for i in inline['ids'].split(',')]
-            obj_list = model.objects.in_bulk(id_list)
-            obj_list = list(obj_list[int(i)] for i in id_list)
-            context['object_list'] = obj_list
-        except ValueError:
-            if settings.DEBUG:
-                raise ValueError(
-                    "The <inline> ids attribute is missing or invalid."
-                )
-            else:
-                return ''
-
-    # If only one ID was specified, retrieve the requested object and add it to
-    # the context.
-    except KeyError:
-        try:
-            obj = model.objects.get(pk=inline['id'])
-            context['object'] = obj
-            context['settings'] = settings
-        except model.DoesNotExist:
+    lookup_value = inline[lookup_key]
+    # If multiple lookups were specified, build a list of all requested objects
+    # and add them to the context.
+    if ',' in lookup_value:
+        lookup_list = [x.strip() for x in lookup_value.split(',')]
+        obj_list = model.objects.filter(**{'%s__in' % lookup_key: lookup_list})
+        if not obj_list:
             if settings.DEBUG:
                 raise model.DoesNotExist(
-                    "%s with pk of '%s' does not exist" % (
+                    "Failed to find any %s with %s of '%s'" % (
                         model_name,
-                        inline['id'],
+                        lookup_key,
+                        lookup_list,
                     )
                 )
             else:
                 return ''
-        except:
+        else:
+            context['object_list'] = obj_list
+    # If only one lookup was specified, retrieve the requested object and add
+    # it to the context.
+    else:
+        try:
+            obj = model.objects.get(**{lookup_key: lookup_value})
+        except model.DoesNotExist:
             if settings.DEBUG:
-                raise TemplateSyntaxError(
-                    "The <inline> id attribute is missing or invalid."
+                raise model.DoesNotExist(
+                    "%s with %s of '%s' does not exist" % (
+                        model_name,
+                        lookup_key,
+                        lookup_value,
+                    )
                 )
             else:
                 return ''
+        else:
+            context['object'] = obj
 
     # Set the name of the template that should be used to render the inline.
     template = [

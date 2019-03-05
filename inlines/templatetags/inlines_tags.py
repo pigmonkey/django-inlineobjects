@@ -15,13 +15,13 @@ def render_inlines(value):
 
         {{ post.body|render_inlines|markdown:"safe" }}
 
-    Inline Syntax (singular)::
+    Inline Syntax (single object)::
 
         <inline type="<app_name>.<model_name>" id="<id>" class="med_left"></inline>
 
-    Inline Syntax (plural)::
+    Inline Syntax (multiple objects)::
 
-        <inline type="<app_name>.<model_name>" ids="<id>, <id>, <id>"></inline>
+        <inline type="<app_name>.<model_name>" id="<id>, <id>, <id>"></inline>
 
     An inline template will be used to render the inline. Templates will be
     located in the following maner:
