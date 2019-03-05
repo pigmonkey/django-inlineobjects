@@ -1,3 +1,4 @@
+from builtins import next, str, object
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from django.apps import apps
