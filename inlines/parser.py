@@ -16,13 +16,18 @@ class InlineRenderer(object):
     def __init__(self, inline, reset_cache=False):
         self.inline = inline
         self.reset_cache = reset_cache
-        if not isinstance(self.inline, Tag):
-            raise ValueError('Inline must be bs4.element.Tag')
+        self.clean()
         self.get_app_model()
         self.get_lookup_key()
         self.get_lookup_value()
         self.build_context()
         self.build_cache_key()
+
+    def clean(self):
+        if not isinstance(self.inline, Tag):
+            raise ValueError('Inline must be bs4.element.Tag')
+        if settings.INLINES_ALLOWED_TYPES and self.inline['type'] not in settings.INLINES_ALLOWED_TYPES:
+            raise ValueError('Inline tag does not have an allowed type: %s' % self.inline)
 
     def get_app_model(self):
         # Look for inline type, 'app.model'
