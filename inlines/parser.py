@@ -1,9 +1,9 @@
 from bs4 import BeautifulSoup
 from django.template import TemplateSyntaxError
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from inlines import settings
 
 
 def inlines(value):
@@ -25,7 +25,7 @@ def render_inline(inline):
     try:
         app_label, model_name = inline['type'].split('.')
     except:
-        if settings.DEBUG:
+        if settings.INLINES_DEBUG:
             raise TemplateSyntaxError(
                 "Couldn't find the attribute 'type' in the <inline> tag."
             )
@@ -36,7 +36,7 @@ def render_inline(inline):
     supported_keys = ['id']
     lookup_key = next((x for x in supported_keys if x in inline.attrs), None)
     if not lookup_key:
-        if settings.DEBUG:
+        if settings.INLINES_DEBUG:
             raise TemplateSyntaxError(
                 "Couldn't find any supported lookup key in the <inline> tag."
             )
@@ -51,7 +51,7 @@ def render_inline(inline):
         )
         model = content_type.model_class()
     except ContentType.DoesNotExist:
-        if settings.DEBUG:
+        if settings.INLINES_DEBUG:
             raise TemplateSyntaxError("Inline ContentType not found.")
         else:
             return ''
@@ -66,7 +66,7 @@ def render_inline(inline):
         lookup_list = [x.strip() for x in lookup_value.split(',')]
         obj_list = model.objects.filter(**{'%s__in' % lookup_key: lookup_list})
         if not obj_list:
-            if settings.DEBUG:
+            if settings.INLINES_DEBUG:
                 raise model.DoesNotExist(
                     "Failed to find any %s with %s of '%s'" % (
                         model_name,
@@ -84,7 +84,7 @@ def render_inline(inline):
         try:
             obj = model.objects.get(**{lookup_key: lookup_value})
         except model.DoesNotExist:
-            if settings.DEBUG:
+            if settings.INLINES_DEBUG:
                 raise model.DoesNotExist(
                     "%s with %s of '%s' does not exist" % (
                         model_name,
