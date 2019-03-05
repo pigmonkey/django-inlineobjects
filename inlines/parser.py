@@ -11,14 +11,7 @@ def inlines(value):
     content_string = str(content)
     for inline in content.findAll('inline'):
         rendered_inline = render_inline(inline)
-        if rendered_inline:
-            inline_template = render_to_string(
-                rendered_inline['template'],
-                rendered_inline['context'],
-            )
-        else:
-            inline_template = ''
-        content_string = content_string.replace(str(inline), inline_template)
+        content_string = content_string.replace(str(inline), rendered_inline)
     return mark_safe(content_string)
 
 
@@ -103,5 +96,5 @@ def render_inline(inline):
         "inlines/default.html",
     ]
 
-    # Return the template name and the context.
-    return {'template': template, 'context': context}
+    # Returned the rendered template.
+    return render_to_string(template, context)
