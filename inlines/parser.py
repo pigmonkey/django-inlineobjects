@@ -22,8 +22,10 @@ def inlines(value, return_list=False):
         for inline in content.findAll('inline'):
             rendered_inline = render_inline(inline)
             if rendered_inline:
-                inline_template = render_to_string(rendered_inline['template'],
-                                                   rendered_inline['context'])
+                inline_template = render_to_string(
+                    rendered_inline['template'],
+                    rendered_inline['context'],
+                )
             else:
                 inline_template = ''
             content_string = content_string.replace(str(inline), inline_template)
@@ -32,8 +34,8 @@ def inlines(value, return_list=False):
 
 def render_inline(inline):
     """
-    Replace inline markup with template markup that matches the
-    appropriate app and model.
+    Replace inline markup with template markup that matches the appropriate app
+    and model.
     """
 
     # Look for inline type, 'app.model'
@@ -41,15 +43,18 @@ def render_inline(inline):
         app_label, model_name = inline['type'].split('.')
     except:
         if settings.DEBUG:
-            raise TemplateSyntaxError("Couldn't find the attribute 'type' in "
-                                       "the <inline> tag.")
+            raise TemplateSyntaxError(
+                "Couldn't find the attribute 'type' in the <inline> tag."
+            )
         else:
             return ''
 
     # Look for content type
     try:
-        content_type = ContentType.objects.get(app_label=app_label,
-                                               model=model_name)
+        content_type = ContentType.objects.get(
+            app_label=app_label,
+            model=model_name,
+        )
         model = content_type.model_class()
     except ContentType.DoesNotExist:
         if settings.DEBUG:
@@ -60,8 +65,8 @@ def render_inline(inline):
     # Create the context with all the attributes in the inline markup.
     context = dict((attr[0], attr[1]) for attr in inline.attrs)
 
-    # If multiple IDs were specified, build a list of all requested objects
-    # and add them to the context.
+    # If multiple IDs were specified, build a list of all requested objects and
+    # add them to the context.
     try:
         try:
             id_list = [int(i) for i in inline['ids'].split(',')]
@@ -70,13 +75,14 @@ def render_inline(inline):
             context['object_list'] = obj_list
         except ValueError:
             if settings.DEBUG:
-                raise ValueError("The <inline> ids attribute is missing or "
-                                 "invalid.")
+                raise ValueError(
+                    "The <inline> ids attribute is missing or invalid."
+                )
             else:
                 return ''
 
-    # If only one ID was specified, retrieve the requested object and add it
-    # to the context.
+    # If only one ID was specified, retrieve the requested object and add it to
+    # the context.
     except KeyError:
         try:
             obj = model.objects.get(pk=inline['id'])
@@ -84,14 +90,19 @@ def render_inline(inline):
             context['settings'] = settings
         except model.DoesNotExist:
             if settings.DEBUG:
-                raise model.DoesNotExist("%s with pk of '%s' does not exist"
-                                         % (model_name, inline['id']))
+                raise model.DoesNotExist(
+                    "%s with pk of '%s' does not exist" % (
+                        model_name,
+                        inline['id'],
+                    )
+                )
             else:
                 return ''
         except:
             if settings.DEBUG:
-                raise TemplateSyntaxError("The <inline> id attribute is "
-                                          "missing or invalid.")
+                raise TemplateSyntaxError(
+                    "The <inline> id attribute is missing or invalid."
+                )
             else:
                 return ''
 
