@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
 from django.db.models import Case, When
 from django.template import TemplateSyntaxError
 from django.template.loader import render_to_string
@@ -18,6 +19,7 @@ class InlineRenderer(object):
         self.get_lookup_key()
         self.get_lookup_value()
         self.build_context()
+        self.build_cache_key()
 
     def get_app_model(self):
         # Look for inline type, 'app.model'
@@ -39,6 +41,14 @@ class InlineRenderer(object):
         else:
             self.lookup_is_list = False
         return self.lookup_value
+
+    def build_cache_key(self):
+        self.cache_key = 'inlines-%s-%s:%s' % (
+            self.inline['type'],
+            self.lookup_key,
+            self.lookup_value,
+        )
+        return self.cache_key
 
     def get_content_type(self):
         self.content_type = ContentType.objects.get(
@@ -88,12 +98,25 @@ class InlineRenderer(object):
         return obj
 
     def render(self):
-        self.get_content_type()
-        if self.lookup_is_list:
-            self.lookup_object_list()
-        else:
-            self.lookup_object()
-        return self.render_template()
+        # Attempt to get the rendered template from the cache.
+        if settings.INLINES_CACHE_TIMEOUT:
+            rendered_template = cache.get(self.cache_key)
+        # If that failed, get the objects and render the template normally.
+        if not rendered_template:
+            self.get_content_type()
+            if self.lookup_is_list:
+                self.lookup_object_list()
+            else:
+                self.lookup_object()
+            rendered_template = self.render_template()
+            # Store the rendered template in the cache.
+            if settings.INLINES_CACHE_TIMEOUT:
+                cache.set(
+                    self.cache_key,
+                    rendered_template,
+                    settings.INLINES_CACHE_TIMEOUT,
+                )
+        return rendered_template
 
 
 def inlines(value):

@@ -7,3 +7,4 @@ from django.conf import settings
 # Specify the keys that should be used to lookup objects.
 INLINES_LOOKUP_KEYS = getattr(settings, 'INLINES_LOOKUP_KEYS', ['id'])
 INLINES_DEBUG = getattr(settings, 'INLINES_DEBUG', settings.DEBUG)
+INLINES_CACHE_TIMEOUT = getattr(settings, 'INLINES_CACHE_TIMEOUT', 0)
