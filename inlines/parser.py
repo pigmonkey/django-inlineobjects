@@ -33,8 +33,7 @@ def render_inline(inline):
             return ''
 
     # Find the first specified lookup key.
-    supported_keys = ['id']
-    lookup_key = next((x for x in supported_keys if x in inline.attrs), None)
+    lookup_key = next((x for x in settings.INLINES_LOOKUP_KEYS if x in inline.attrs), None)
     if not lookup_key:
         if settings.INLINES_DEBUG:
             raise TemplateSyntaxError(
