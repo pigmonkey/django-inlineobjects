@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
-from django.template import TemplateSyntaxError
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Case, When
+from django.template import TemplateSyntaxError
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from inlines import settings
@@ -63,7 +64,14 @@ def render_inline(inline):
     # and add them to the context.
     if ',' in lookup_value:
         lookup_list = [x.strip() for x in lookup_value.split(',')]
-        obj_list = model.objects.filter(**{'%s__in' % lookup_key: lookup_list})
+        # Build a conditional to sort the objects, such that they are returned
+        # in the same order that they were specified in the tag.
+        ordering = Case(*[When(then=index, **{lookup_key: x}) for index, x in enumerate(lookup_list)])
+        obj_list = model.objects.filter(
+            **{'%s__in' % lookup_key: lookup_list}
+        ).order_by(
+            ordering
+        )
         if not obj_list:
             if settings.INLINES_DEBUG:
                 raise model.DoesNotExist(
