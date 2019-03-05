@@ -17,11 +17,11 @@ def render_inlines(value):
 
     Inline Syntax (singular)::
 
-        <inline type="<app_name>.<model_name>" id="<id>" class="med_left" />
+        <inline type="<app_name>.<model_name>" id="<id>" class="med_left"></inline>
 
     Inline Syntax (plural)::
 
-        <inline type="<app_name>.<model_name>" ids="<id>, <id>, <id>" />
+        <inline type="<app_name>.<model_name>" ids="<id>, <id>, <id>"></inline>
 
     An inline template will be used to render the inline. Templates will be
     located in the following maner:

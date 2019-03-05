@@ -39,7 +39,7 @@ Usage
 
 To include a photo in a blog post body, you might put the following into the body.
 
-    <inline type="media.photo" id="1" />
+    <inline type="media.photo" id="1"></inline>
 
 To render this in a template, you would use the template filter.
 

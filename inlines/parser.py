@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from django.template import TemplateSyntaxError
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -8,15 +9,7 @@ from django.utils.safestring import mark_safe
 
 
 def inlines(value, return_list=False):
-    try:
-        from BeautifulSoup import BeautifulStoneSoup
-    except ImportError:
-        from beautifulsoup import BeautifulStoneSoup
-
-    content = BeautifulStoneSoup(value, selfClosingTags=['inline', 'img', 'br',
-                                                         'input', 'meta',
-                                                         'link', 'hr'])
-
+    content = BeautifulSoup(value, 'html.parser')
     # Return a list of inline objects found in the value.
     if return_list:
         inline_list = []
@@ -27,6 +20,7 @@ def inlines(value, return_list=False):
 
     # Replace inline markup in the value with rendered inline templates.
     else:
+        content_string = str(content)
         for inline in content.findAll('inline'):
             rendered_inline = render_inline(inline)
             if rendered_inline:
@@ -34,8 +28,8 @@ def inlines(value, return_list=False):
                                                    rendered_inline['context'])
             else:
                 inline_template = ''
-            value = value.replace(str(inline), inline_template)
-        return mark_safe(unicode(value))
+            content_string = content_string.replace(str(inline), inline_template)
+        return mark_safe(content_string)
 
 
 def render_inline(inline):

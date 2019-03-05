@@ -18,5 +18,5 @@ setup(
     long_description=open('README.md').read(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=['BeautifulSoup>=3.0.0'],
+    install_requires=['beautifulsoup4'],
 )
