@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from bs4.element import Tag
-from django.contrib.contenttypes.models import ContentType
+from django.apps import apps
 from django.core.cache import cache
 from django.db.models import Case, When
 from django.template import TemplateSyntaxError
@@ -50,12 +50,9 @@ class InlineRenderer(object):
         )
         return self.cache_key
 
-    def get_content_type(self):
-        self.content_type = ContentType.objects.get(
-            app_label=self.app_label,
-            model=self.model_name,
-        )
-        self.model = self.content_type.model_class()
+    def get_model(self):
+        self.model = apps.get_model(self.app_label, self.model_name)
+        return self.model
 
     def build_context(self):
         # Create the context with all the attributes in the inline markup.
@@ -103,7 +100,7 @@ class InlineRenderer(object):
             rendered_template = cache.get(self.cache_key)
         # If that failed, get the objects and render the template normally.
         if not rendered_template:
-            self.get_content_type()
+            self.get_model()
             if self.lookup_is_list:
                 self.lookup_object_list()
             else:
