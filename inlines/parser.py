@@ -66,7 +66,7 @@ class InlineRenderer(object):
 
     def get_manager(self):
         self.manager_name = 'all'
-        if self.inline['type'] in settings.INLINES_MANAGERS:
+        if settings.INLINES_MANAGERS and self.inline['type'] in settings.INLINES_MANAGERS:
             self.manager_name = settings.INLINES_MANAGERS[self.inline['type']]
         self.manager = getattr(self.model.objects, self.manager_name)
         return self.manager
