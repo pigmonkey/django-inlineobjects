@@ -64,6 +64,13 @@ class InlineRenderer(object):
         self.model = apps.get_model(self.app_label, self.model_name)
         return self.model
 
+    def get_manager(self):
+        self.manager_name = 'all'
+        if self.inline['type'] in settings.INLINES_MANAGERS:
+            self.manager_name = settings.INLINES_MANAGERS[self.inline['type']]
+        self.manager = getattr(self.model.objects, self.manager_name)
+        return self.manager
+
     def build_context(self):
         # Create the context with all the attributes in the inline markup.
         self.context = self.inline.attrs.copy()
@@ -82,7 +89,7 @@ class InlineRenderer(object):
         # Build a conditional to sort the objects, such that they are returned
         # in the same order that they were specified in the tag.
         ordering = Case(*[When(then=index, **{self.lookup_key: x}) for index, x in enumerate(lookup_list)])
-        obj_list = self.model.objects.filter(
+        obj_list = self.manager().filter(
             **{'%s__in' % self.lookup_key: lookup_list}
         ).order_by(
             ordering
@@ -96,7 +103,7 @@ class InlineRenderer(object):
 
     def lookup_object(self):
         try:
-            obj = self.model.objects.get(**{self.lookup_key: self.lookup_value})
+            obj = self.manager().get(**{self.lookup_key: self.lookup_value})
         except self.model.DoesNotExist:
             raise ValueError(
                 'Failed to find object for tag: %s' % self.inline
@@ -112,6 +119,7 @@ class InlineRenderer(object):
         # If that failed, get the objects and render the template normally.
         if not rendered_template:
             self.get_model()
+            self.get_manager()
             if self.lookup_is_list:
                 self.lookup_object_list()
             else:
