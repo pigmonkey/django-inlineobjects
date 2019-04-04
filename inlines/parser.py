@@ -20,6 +20,7 @@ class InlineRenderer(object):
         self.get_app_model()
         self.get_lookup_key()
         self.get_lookup_value()
+        self.get_template_name_suffix()
         self.build_context()
         self.build_cache_key()
 
@@ -50,6 +51,13 @@ class InlineRenderer(object):
             self.lookup_is_list = False
         return self.lookup_value
 
+    def get_template_name_suffix(self):
+        self.template_name_suffix = ''
+        self.template_key = next((x for x in ['template', 'template_name_suffix'] if x in self.inline.attrs), None)
+        if self.template_key:
+            self.template_name_suffix = '_%s' % self.inline[self.template_key]
+        return self.template_name_suffix
+
     def build_cache_key(self):
         self.cache_key = slugify(
             'inlines-%s-%s:%s' % (
@@ -78,8 +86,8 @@ class InlineRenderer(object):
 
     def render_template(self):
         template = [
-            "%s/inlines/%s.html" % (self.app_label, self.model_name),
-            "inlines/%s_%s.html" % (self.app_label, self.model_name),
+            "%s/inlines/%s%s.html" % (self.app_label, self.model_name, self.template_name_suffix),
+            "inlines/%s_%s%s.html" % (self.app_label, self.model_name, self.template_name_suffix),
             "inlines/default.html",
         ]
         return render_to_string(template, self.context)
