@@ -1,4 +1,7 @@
+import hashlib
+
 from builtins import next, str, object
+
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from django.apps import apps
@@ -59,13 +62,8 @@ class InlineRenderer(object):
         return self.template_name_suffix
 
     def build_cache_key(self):
-        self.cache_key = slugify(
-            'inlines-%s-%s:%s' % (
-                self.inline['type'],
-                self.lookup_key,
-                self.lookup_value,
-            )
-        )
+        self.cache_key_string = 'inlines:%s' % str(self.inline.attrs)
+        self.cache_key = hashlib.md5(self.cache_key_string).hexdigest()
         return self.cache_key
 
     def get_model(self):
