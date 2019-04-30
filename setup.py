@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='django-inlineobjects',
     packages=find_packages(),
-    version='2.0.0',
+    version='2.0.1',
     description='A reusable Django application used to insert content objects into other pieces of content.',
     author='Peter Hogg',
     author_email='peter@havenaut.net',
