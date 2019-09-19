@@ -63,7 +63,7 @@ class InlineRenderer(object):
 
     def build_cache_key(self):
         self.cache_key_string = 'inlines:%s' % str(self.inline.attrs)
-        self.cache_key = hashlib.md5(self.cache_key_string).hexdigest()
+        self.cache_key = hashlib.md5(self.cache_key_string.encode('utf-8')).hexdigest()
         return self.cache_key
 
     def get_model(self):
