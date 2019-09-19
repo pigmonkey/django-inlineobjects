@@ -1,6 +1,12 @@
 # Change Log
 
 
+## [ 2.0.3 ] - 2019-09-19
+
+### Changed
+- Specify that the package description is Markdown.
+
+
 ## [ 2.0.2 ] - 2019-09-19
 
 ### Fixed
