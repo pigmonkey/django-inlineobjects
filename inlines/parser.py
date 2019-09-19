@@ -160,7 +160,7 @@ class ContentParser(object):
                 rendered_inline = InlineRenderer(inline, self.reset_cache).render()
             except Exception as e:
                 if settings.INLINES_DEBUG:
-                    raise TemplateSyntaxError('Failed to render inline: %s' % e.message)
+                    raise TemplateSyntaxError('Failed to render inline: %s' % e)
                 else:
                     rendered_inline = ''
             self.soup_string = self.soup_string.replace(str(inline), rendered_inline)
